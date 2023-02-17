@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Créer une machine virtuelle";
+}
+<h1>@ViewData["Title"]</h1>
+
+<form method="post" action="/Home/CreateAzureVm">
+    <div class="form-group">
+        <label for="inputHostname">Hostname</label>
+        <input type="text" class="form-control" id="inputHostname" placeholder="Hostname of the VM">
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="inputUsername">Username</label>
+            <input type="text" class="form-control" name="username" id="inputUsername" placeholder="Not admin">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword">Password</label>
+            <input type="password" class="form-control" id="inputPassword" placeholder="Not admin too">
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Sign in</button>
+</form>

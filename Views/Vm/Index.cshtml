@@ -1,0 +1,100 @@
+@using CloudAuthApp.Controllers
+@model IEnumerable<CloudAuthApp.Models.VmModel>
+
+@{
+    ViewData["Title"] = "Machines virtuelles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+@if (!Model.Any())
+{
+    <p>
+        <a asp-action="Create">Nouvelle VM</a>
+    </p>
+}
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IpPublic)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Login)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Password)
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IpPublic)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Login)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Password)
+            </td>
+            <td class="flex-row">
+                @if (item.IsRunning)
+                {
+                    <form asp-action="Stop" asp-route-id="@item.Id">
+                        <a class="btn btn-success" href="ssh://@item.Login@@@item.IpPublic">SSH</a>
+                        <button class="rdp-file btn btn-success" data-ip="@item.IpPublic" data-username="@item.Login" data-password="@item.Password">RDP file</button>
+                        <input class="btn btn-primary" type="submit" value="Stop"/>
+                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="Start" asp-route-id="@item.Id">
+                        <a class="btn btn-success disabled" href="ssh://@item.Login@@@item.IpPublic">SSH</a>
+                        <button class="rdp-file btn btn-success" data-ip="@item.IpPublic" data-username="@item.Login" data-password="@item.Password">RDP file</button>
+                        <input class="btn btn-primary" type="submit" value="Start"/>
+                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<script>  
+const buttons = document.querySelectorAll(".rdp-file")
+
+buttons.forEach((btn)=>{
+    btn.addEventListener('click', (ev)=>{
+        const target = ev.target
+        const ip = target.getAttribute('data-ip')
+        const [username, password] = [target.getAttribute('data-username'), target.getAttribute('data-password')]
+        rdpFile(ip, username, password)
+    })    
+})
+
+const rdpFile = (ip, username, password) =>{
+    const link = document.createElement("a");
+    const file = new Blob([`full address:s:${ip}\nusername:s:${username}\npassword:s:${password}`], { type: 'text/plain' }); 
+    link.href = URL.createObjectURL(file);
+    link.download = `${ip}.rdp`;
+    link.click(); 
+}
+    
+</script>
